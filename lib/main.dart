@@ -17,9 +17,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.grey,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'Flutter WebSocket Client'),
     );
   }
 }
@@ -50,23 +50,14 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _incrementCounter() async {
     await _webSocketService.sendMessage('Hello! It is me, Mustafa. :)');
     setState(() {
-      print("Hi to me");
       _counter++;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
       body: Center(
@@ -74,7 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             const Text(
-              'You have pushed the button this many times:',
+              'The button will send a message to the WebSocket server.',
             ),
             Text(
               '$_counter',
@@ -83,7 +74,27 @@ class _MyHomePageState extends State<MyHomePage> {
             StreamBuilder(
               stream: channel.stream,
               builder: (context, snapshot) {
-                return Text(snapshot.hasData ? '${snapshot.data}' : '');
+                if (snapshot.hasData) {
+                  List<String> dataList = snapshot.data
+                      .split(','); // Split the data into a list of strings
+                  return SizedBox(
+                    height: 400,
+                    child: Container(
+                      color: Colors.grey[800],
+                      child: ListView.builder(
+                        itemCount: dataList.length,
+                        itemBuilder: (context, index) {
+                          return ListTile(
+                            title: Text(dataList[index],
+                                style: TextStyle(color: Colors.green)),
+                          );
+                        },
+                      ),
+                    ),
+                  );
+                } else {
+                  return Text('');
+                }
               },
             )
           ],
